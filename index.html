@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubix - Générateur de Prompt Template</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Trebuchet MS', sans-serif;
+            background: linear-gradient(135deg, #051E50 0%, #0a3d80 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 56px;
+            font-weight: 900;
+            color: white;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-x {
+            color: #FFD700;
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            font-size: 18px;
+            color: #FFD700;
+            font-weight: 600;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #FFD700;
+            font-size: 14px;
+        }
+        
+        .label-hint {
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Trebuchet MS', sans-serif;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        textarea::placeholder,
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        select {
+            cursor: pointer;
+        }
+        
+        select option {
+            background: #051E50;
+            color: white;
+        }
+        
+        .radio-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .radio-option {
+            padding: 15px 10px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+        
+        .radio-option:hover {
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .radio-option.selected {
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .radio-label {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .radio-text {
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFC700 100%);
+            color: #051E50;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+        }
+        
+        .info-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid #FFD700;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .prompt-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            min-height: 400px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.95);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .prompt-display::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .prompt-display::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        .prompt-display::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 4px;
+        }
+        
+        .variable-highlight {
+            background: rgba(255, 215, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #FFD700;
+            font-weight: 700;
+        }
+        
+        .section-header {
+            color: #FFD700;
+            font-weight: 900;
+            font-size: 14px;
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .copy-btn {
+            width: 100%;
+            padding: 18px;
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            border: 3px solid #FFD700;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .copy-btn.copied {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+        
+        .tips-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .tips-section h3 {
+            color: #FFD700;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .tips-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tips-section li {
+            padding: 8px 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .tips-section li:before {
+            content: "→ ";
+            color: #FFD700;
+            font-weight: 900;
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">RUBI<span class="logo-x">X</span></div>
+            <h1>📝 Générateur de Prompt Template</h1>
+            <p class="tagline">Créez votre prompt personnalisé - 100% Local - Zéro donnée envoyée</p>
+        </div>
+        
+        <div class="main-grid">
+            <!-- INPUT PANEL -->
+            <div class="panel">
+                <h2>⚙️ Configuration du Prompt</h2>
+                
+                <div class="info-box">
+                    🔒 <strong>100% Privé & Local</strong><br>
+                    Aucune donnée n'est envoyée à une API. Le prompt est généré localement dans votre navigateur.
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        📝 Votre message / Idée principale
+                        <div class="label-hint">Décrivez ce que vous voulez communiquer</div>
+                    </label>
+                    <textarea id="mainMessage" placeholder="Exemple : 'Transformation digitale avec l'IA' ou 'Croissance de 50% en 2025' ou 'Nouvelle stratégie data'">Transformation digitale avec l'IA pour améliorer nos process</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        🎯 Objectif de l'image
+                        <div class="label-hint">Ce que l'image doit transmettre</div>
+                    </label>
+                    <select id="objective">
+                        <option value="transformation">Montrer une transformation (avant → après)</option>
+                        <option value="growth">Illustrer la croissance / progression</option>
+                        <option value="innovation">Mettre en avant l'innovation / technologie</option>
+                        <option value="performance">Démontrer la performance / résultats</option>
+                        <option value="strategy">Expliquer une stratégie / plan d'action</option>
+                        <option value="team">Valoriser l'équipe / collaboration</option>
+                        <option value="leadership">Affirmer le leadership / domination</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        💡 Idées visuelles spécifiques (optionnel)
+                        <div class="label-hint">Des éléments que vous voulez absolument voir</div>
+                    </label>
+                    <input type="text" id="visualIdeas" placeholder="Ex: réseau neuronal, graphiques montants, terrain de sport...">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        🎨 Univers visuel
+                        <div class="label-hint">Ambiance générale de l'image</div>
+                    </label>
+                    <div class="radio-group">
+                        <div class="radio-option selected" onclick="selectUniverse('tech')">
+                            <span class="radio-label">🧠</span>
+                            <span class="radio-text">Tech AI<br>Futuriste</span>
+                        </div>
+                        <div class="radio-option" onclick="selectUniverse('business')">
+                            <span class="radio-label">💼</span>
+                            <span class="radio-text">Business<br>Corporate</span>
+                        </div>
+                        <div class="radio-option" onclick="selectUniverse('dynamic')">
+                            <span class="radio-label">⚡</span>
+                            <span class="radio-text">Dynamique<br>Énergie</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        📐 Format de l'image
+                        <div class="label-hint">Selon votre usage</div>
+                    </label>
+                    <div class="radio-group">
+                        <div class="radio-option selected" onclick="selectFormat('portrait')">
+                            <span class="radio-label">📱</span>
+                            <span class="radio-text">Portrait<br>9:16</span>
+                        </div>
+                        <div class="radio-option" onclick="selectFormat('landscape')">
+                            <span class="radio-label">🖥️</span>
+                            <span class="radio-text">Paysage<br>16:9</span>
+                        </div>
+                        <div class="radio-option" onclick="selectFormat('square')">
+                            <span class="radio-label">⬜</span>
+                            <span class="radio-text">Carré<br>1:1</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="generate-btn" onclick="generatePrompt()">
+                    ✨ Générer le Prompt
+                </button>
+                
+                <div class="tips-section">
+                    <h3>💡 Où utiliser ce prompt ?</h3>
+                    <ul>
+                        <li><strong>Bing Image Creator</strong> (gratuit, DALL-E 3)</li>
+                        <li><strong>Leonardo.ai</strong> (15 images/jour gratuit)</li>
+                        <li><strong>Playground AI</strong> (500 images/jour)</li>
+                        <li><strong>Midjourney</strong> (payant, haute qualité)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- OUTPUT PANEL -->
+            <div class="panel">
+                <h2>📋 Prompt Généré</h2>
+                
+                <div class="info-box">
+                    ✅ <strong>Prêt à copier-coller</strong><br>
+                    Les parties en <span style="background: rgba(255,215,0,0.3); padding: 2px 6px; border-radius: 3px;">surbrillance</span> sont personnalisées avec vos informations.
+                </div>
+                
+                <div class="prompt-display" id="promptDisplay">
+                    Remplissez le formulaire et cliquez sur "Générer le Prompt"
+                </div>
+                
+                <button class="copy-btn" onclick="copyPrompt()" id="copyBtn">
+                    📋 Copier dans le Presse-Papier
+                </button>
+                
+                <div class="tips-section">
+                    <h3>🎯 Comment utiliser :</h3>
+                    <ul>
+                        <li>Cliquez sur "Copier dans le Presse-Papier"</li>
+                        <li>Allez sur votre outil d'IA préféré</li>
+                        <li>Collez le prompt (Ctrl+V / Cmd+V)</li>
+                        <li>Générez votre image !</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedUniverse = 'tech';
+        let selectedFormat = 'portrait';
+        
+        function selectUniverse(universe) {
+            selectedUniverse = universe;
+            document.querySelectorAll('.radio-option').forEach(el => {
+                if(el.onclick.toString().includes(universe)) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
+                }
+            });
+        }
+        
+        function selectFormat(format) {
+            selectedFormat = format;
+            const buttons = document.querySelectorAll('.radio-option');
+            buttons.forEach(el => {
+                if(el.onclick.toString().includes(format)) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
+                }
+            });
+        }
+        
+        function generatePrompt() {
+            const mainMessage = document.getElementById('mainMessage').value;
+            const objective = document.getElementById('objective').value;
+            const visualIdeas = document.getElementById('visualIdeas').value;
+            
+            // Build the prompt template
+            let prompt = buildPromptTemplate(mainMessage, objective, visualIdeas, selectedUniverse, selectedFormat);
+            
+            // Display with highlighting
+            displayPromptWithHighlights(prompt);
+        }
+        
+        function buildPromptTemplate(message, objective, ideas, universe, format) {
+            // PARTIE FIXE - Charte Rubix et consignes qualité
+            const fixedInstructions = `Create a premium corporate illustration for Rubix brand.
+
+🎨 BRAND GUIDELINES (STRICT):
+- Primary Color: Deep Navy Blue (#051E50)
+- Accent Color: Golden Yellow (#FFD700) 
+- Only use these two colors + white/grays
+- NO other colors allowed
+- Modern, clean, professional aesthetic
+- High-end presentation quality
+
+📐 FORMAT: ${getFormatText(format)}
+
+🎯 VISUAL OBJECTIVE: ${getObjectiveText(objective)}`;
+
+            // PARTIE VARIABLE - Message utilisateur
+            const userContent = `
+
+💬 MAIN MESSAGE TO COMMUNICATE:
+"${message}"`;
+
+            // PARTIE VARIABLE - Idées visuelles spécifiques
+            const visualSection = ideas ? `
+
+💡 SPECIFIC VISUAL ELEMENTS TO INCLUDE:
+${ideas}` : '';
+
+            // PARTIE FIXE - Univers et style
+            const universeSection = `
+
+🌟 VISUAL UNIVERSE: ${getUniverseText(universe)}`;
+
+            // PARTIE FIXE - Consignes de composition
+            const compositionRules = `
+
+📷 COMPOSITION RULES:
+- Cinematic lighting with depth
+- Premium corporate feel (not stock photo)
+- Clean, impactful layout
+- Professional color grading
+- High contrast for readability
+- Avoid clichés and generic imagery
+
+🎬 STYLE DIRECTION:
+- Modern and sophisticated
+- Clear visual hierarchy
+- Storytelling through composition
+- Business-appropriate
+- Presentation-ready quality
+
+⚠️ CRITICAL:
+- Use ONLY Rubix colors (Navy Blue #051E50 + Golden Yellow #FFD700)
+- NO gradients unless specified in brand guidelines
+- Premium quality, not generic stock imagery
+- Clear and professional execution`;
+
+            // PARTIE FIXE - Technical specs
+            const technicalSpecs = `
+
+🔧 TECHNICAL SPECIFICATIONS:
+- High resolution
+- ${format === 'portrait' ? 'Vertical 9:16 ratio' : format === 'landscape' ? 'Horizontal 16:9 ratio' : 'Square 1:1 ratio'}
+- Clean edges
+- Suitable for professional presentations
+- Optimized for digital display`;
+
+            return fixedInstructions + userContent + visualSection + universeSection + compositionRules + technicalSpecs;
+        }
+        
+        function getFormatText(format) {
+            switch(format) {
+                case 'portrait': return '9:16 vertical (ideal for LinkedIn posts, mobile)';
+                case 'landscape': return '16:9 horizontal (ideal for presentations, slides)';
+                case 'square': return '1:1 square (ideal for Instagram, universal)';
+                default: return '9:16 vertical';
+            }
+        }
+        
+        function getObjectiveText(objective) {
+            switch(objective) {
+                case 'transformation': return 'Show a clear transformation journey from before to after state';
+                case 'growth': return 'Illustrate growth, progression, and upward momentum';
+                case 'innovation': return 'Highlight innovation, technology, and forward-thinking';
+                case 'performance': return 'Demonstrate performance, results, and measurable success';
+                case 'strategy': return 'Explain strategic approach and tactical execution';
+                case 'team': return 'Showcase teamwork, collaboration, and collective strength';
+                case 'leadership': return 'Assert leadership position, dominance, and market authority';
+                default: return 'Communicate the message clearly and professionally';
+            }
+        }
+        
+        function getUniverseText(universe) {
+            switch(universe) {
+                case 'tech': 
+                    return 'Futuristic tech AI - Neural networks, digital connections, glowing nodes, advanced technology visualization, intelligent systems';
+                case 'business': 
+                    return 'Premium corporate business - Executive boardroom feel, professional dashboards, strategic planning, business intelligence';
+                case 'dynamic': 
+                    return 'Dynamic energy - Motion, momentum, speed, power, explosive growth, breakthrough performance';
+                default: return 'Tech AI futuristic';
+            }
+        }
+        
+        function displayPromptWithHighlights(prompt) {
+            const display = document.getElementById('promptDisplay');
+            
+            // Highlight user variables
+            let highlighted = prompt;
+            
+            // Highlight main message
+            const messageMatch = prompt.match(/"([^"]+)"/);
+            if(messageMatch) {
+                highlighted = highlighted.replace(messageMatch[0], `<span class="variable-highlight">${messageMatch[0]}</span>`);
+            }
+            
+            // Highlight visual ideas section if present
+            const ideasMatch = prompt.match(/SPECIFIC VISUAL ELEMENTS TO INCLUDE:\n([^\n]+)/);
+            if(ideasMatch) {
+                highlighted = highlighted.replace(ideasMatch[1], `<span class="variable-highlight">${ideasMatch[1]}</span>`);
+            }
+            
+            // Add section headers styling
+            highlighted = highlighted.replace(/🎨 BRAND GUIDELINES/g, '<span class="section-header">🎨 BRAND GUIDELINES</span>');
+            highlighted = highlighted.replace(/📐 FORMAT:/g, '<span class="section-header">📐 FORMAT:</span>');
+            highlighted = highlighted.replace(/🎯 VISUAL OBJECTIVE:/g, '<span class="section-header">🎯 VISUAL OBJECTIVE:</span>');
+            highlighted = highlighted.replace(/💬 MAIN MESSAGE/g, '<span class="section-header">💬 MAIN MESSAGE</span>');
+            highlighted = highlighted.replace(/💡 SPECIFIC VISUAL/g, '<span class="section-header">💡 SPECIFIC VISUAL</span>');
+            highlighted = highlighted.replace(/🌟 VISUAL UNIVERSE:/g, '<span class="section-header">🌟 VISUAL UNIVERSE:</span>');
+            highlighted = highlighted.replace(/📷 COMPOSITION RULES:/g, '<span class="section-header">📷 COMPOSITION RULES:</span>');
+            highlighted = highlighted.replace(/🎬 STYLE DIRECTION:/g, '<span class="section-header">🎬 STYLE DIRECTION:</span>');
+            highlighted = highlighted.replace(/⚠️ CRITICAL:/g, '<span class="section-header">⚠️ CRITICAL:</span>');
+            highlighted = highlighted.replace(/🔧 TECHNICAL/g, '<span class="section-header">🔧 TECHNICAL</span>');
+            
+            display.innerHTML = highlighted;
+            
+            // Store plain text for copying
+            display.dataset.plainText = prompt;
+        }
+        
+        function copyPrompt() {
+            const display = document.getElementById('promptDisplay');
+            const plainText = display.dataset.plainText;
+            
+            if(!plainText || plainText === 'Remplissez le formulaire et cliquez sur "Générer le Prompt"') {
+                alert('⚠️ Veuillez d\'abord générer un prompt !');
+                return;
+            }
+            
+            navigator.clipboard.writeText(plainText).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '✅ Copié dans le Presse-Papier !';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = '📋 Copier dans le Presse-Papier';
+                    btn.classList.remove('copied');
+                }, 3000);
+            }).catch(err => {
+                alert('❌ Erreur lors de la copie. Veuillez sélectionner et copier manuellement (Ctrl+C).');
+            });
+        }
+        
+        // Generate initial prompt on load
+        window.onload = function() {
+            generatePrompt();
+        };
+    </script>
+</body>
+</html>
